@@ -1,0 +1,1 @@
+# aws-firehose-eventbridge-subscriber
