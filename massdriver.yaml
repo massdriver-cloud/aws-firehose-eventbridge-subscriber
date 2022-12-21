@@ -1,0 +1,160 @@
+# TODO:
+# - Descriptions w/ Markdown
+# - Alarms
+schema: draft-07
+name: "aws-firehose-eventbridge-subscriber"
+description: ""
+source_url: github.com/massdriver-cloud/aws-firehose-eventbridge-subscriber
+access: "public"
+type: "infrastructure"
+
+# schema-params.json
+# JSON Schema sans-fields above
+params:
+  examples:
+    - __name: Small Batch
+      event_rule:
+        event_filter: all
+      firehose:
+        dynamic_partitioning:
+          enabled: false
+        buffer_size: 10
+        buffer_interval: 60
+    - __name: Large Batch
+      event_rule:
+        event_filter: all
+      firehose:
+        dynamic_partitioning:
+          enabled: false
+        buffer_size: 128
+        buffer_interval: 600
+  required:
+    - event_rule
+    - firehose
+  properties:
+    event_rule:
+      type: object
+      title: "Event Rule Settings"
+      dependencies:
+        event_filter:
+          oneOf:
+            - properties:
+                event_filter:
+                  const: "custom"
+                event_filter_pattern:
+                  type: string
+                  title: "Event Filter Pattern"
+                  default: "{}"
+                  validJson: true
+            - properties:
+                event_filter:
+                  const: "all"
+      properties:
+        event_filter:
+          type: string
+          title: "Event Filter"
+          default: "all"
+          enum:
+            - "all"
+            - "custom"
+    firehose:
+      type: object
+      title: "Firehose Settings"
+      if:
+        properties:
+          dynamic_partitioning:
+            properties:
+              enabled:
+                const: true
+      then:
+        properties:
+          buffer_size:
+            minimum: 64
+      required:
+        - buffer_size
+        - buffer_interval
+      properties:
+        dynamic_partitioning:
+          type: object
+          title: "Dynamic Partitioning"
+          required:
+            - enabled
+          dependencies:
+            enabled:
+              oneOf:
+                - properties:
+                    enabled:
+                      const: true
+                    query:
+                      type: string
+                      title: "JQ Query"
+                      description: "JQ expression which will be used to parse incoming events and produce a single string to be used as the partition key in S3. More information on JQ can be found [here](https://devdocs.io/jq/)"
+                    required:
+                      - query
+                - properties:
+                    enabled:
+                      const: false
+          properties:
+            enabled:
+              type: boolean
+              title: "Enabled?"
+              default: false
+        buffer_size:
+          type: integer
+          title: "Buffer Size"
+          default: 64
+          minimum: 1
+          maximum: 128
+        buffer_interval:
+          type: integer
+          title: "Buffer Interval"
+          default: 300
+          minimum: 60
+          maximum: 900
+
+# schema-connections.json
+# Named list of input connections (artifacts) (map[name]artifact)
+
+connections:
+  required:
+    - aws_authentication
+    - event_source
+    - event_destination
+  properties:
+    aws_authentication:
+      $ref: massdriver/aws-iam-role
+    event_source:
+      $ref: massdriver/aws-eventbridge
+    event_destination:
+      $ref: massdriver/aws-s3-bucket
+
+# schema-artifacts.json
+# Named list of output artifacts  (map[name]artifact)
+artifacts:
+  properties: {}
+
+# schema-ui.json
+# List of form customizations for params-schema
+ui:
+  ui:order:
+    - event_rule
+    - firehose
+  event_rule:
+    ui:order:
+      - event_filter
+      - event_filter_pattern
+  firehose:
+    ui:order:
+      - buffer_size
+      - buffer_interval
+      - dynamic_partitioning
+    dynamic_partioning:
+      ui:order:
+        - enabled
+        - query
+    buffer_size:
+      ui:field: conversionFieldData
+      unit: MB
+    buffer_interval:
+      ui:field: conversionFieldTime
+      unit: Seconds
