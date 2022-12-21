@@ -89,8 +89,8 @@ params:
                       type: string
                       title: "JQ Query"
                       description: "JQ expression which will be used to parse incoming events and produce a single string to be used as the partition key in S3. More information on JQ can be found [here](https://devdocs.io/jq/)"
-                    required:
-                      - query
+                  required:
+                    - query
                 - properties:
                     enabled:
                       const: false
