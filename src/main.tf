@@ -9,8 +9,8 @@ module "firehose" {
   dynamic_partitioning_enabled = var.firehose.dynamic_partitioning.enabled
   query                        = local.dynamic_partitioning_query
   destination                  = "s3"
-  buffer_size_mb               = var.firehose.buffer_size
-  buffer_interval_seconds      = var.firehose.buffer_interval
+  buffer_size_mb               = var.firehose.buffer_size_mb
+  buffer_interval_seconds      = var.firehose.buffer_interval_seconds
   bucket_arn                   = var.event_destination.data.infrastructure.arn
   write_policy_arn             = var.event_destination.data.security.iam.write.policy_arn
 }
