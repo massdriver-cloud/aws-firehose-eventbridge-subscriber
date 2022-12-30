@@ -1,6 +1,6 @@
 schema: draft-07
 name: "aws-firehose-eventbridge-subscriber"
-description: ""
+description: "Creates a ..."
 source_url: github.com/massdriver-cloud/aws-firehose-eventbridge-subscriber
 access: "public"
 type: "infrastructure"
