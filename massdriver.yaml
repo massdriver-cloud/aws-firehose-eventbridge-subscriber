@@ -1,6 +1,6 @@
 schema: draft-07
 name: "aws-firehose-eventbridge-subscriber"
-description: ""
+description: "Write event data from EventBridge to S3."
 source_url: github.com/massdriver-cloud/aws-firehose-eventbridge-subscriber
 access: "public"
 type: "infrastructure"
