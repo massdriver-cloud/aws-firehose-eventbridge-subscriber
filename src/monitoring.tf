@@ -58,7 +58,7 @@ module "s3_delivery_alarm" {
   evaluation_periods  = 1
   message             = "Kinesis Firehose ${var.md_metadata.name_prefix}: Error Rate > ${(local.alarms.s3_delivery_success.threshold / 100)}%"
   display_name        = "Firehose S3 Delivery Errors"
-  threshold           = local.alarms.server_errors.threshold / 100
+  threshold           = local.alarms.s3_delivery_success.threshold / 100
   display_metric_key  = "m2"
 
   metric_queries = {
