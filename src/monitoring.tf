@@ -19,8 +19,8 @@ locals {
     "CUSTOM"    = lookup(var.monitoring, "alarms", local.automated_alarms)
   }
 
-  alarms                  = lookup(local.alarms_map, var.monitoring.mode, local.automated_alarms)
-  create_partioning_alarm = var.firehose.dynamic_partitioning.enabled && lookup(local.alarms, "partition_size", null) != null
+  alarms                    = lookup(local.alarms_map, var.monitoring.mode, local.automated_alarms)
+  create_partitioning_alarm = var.firehose.dynamic_partitioning.enabled && lookup(local.alarms, "partition_size", null) != null
 }
 
 module "alarm_channel" {
