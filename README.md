@@ -54,13 +54,19 @@ Form input parameters for configuring a bundle for deployment.
 <!-- PARAMS:START -->
 ## Properties
 
-- **`event_rule`** *(object)*
+- **`event_rule`** *(object)*: Filter events based on data within the event. More information can be found [here](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html).
   - **`event_filter`** *(string)*: Must be one of: `['all', 'custom']`. Default: `all`.
 - **`firehose`** *(object)*
-  - **`buffer_interval`** *(integer)*: Minimum: `60`. Maximum: `900`. Default: `300`.
-  - **`buffer_size`** *(integer)*: Minimum: `1`. Maximum: `128`. Default: `64`.
+  - **`buffer_interval_seconds`** *(integer)*: Minimum: `60`. Maximum: `900`. Default: `300`.
+  - **`buffer_size_mb`** *(integer)*: Minimum: `1`. Maximum: `128`. Default: `64`.
   - **`dynamic_partitioning`** *(object)*
-    - **`enabled`** *(boolean)*: Default: `False`.
+    - **`enabled`** *(boolean)*: Dynamic partitioning allows you to parse incoming events and pull a value which can be used as a prefix in s3 directories. More information about dynamic paritioning can be found [here](https://docs.aws.amazon.com/firehose/latest/dev/dynamic-partitioning.html). Default: `False`.
+- **`monitoring`** *(object)*
+  - **`mode`** *(string)*: Enable and customize Kinesis Delivery Stream metric alarms. Default: `AUTOMATED`.
+    - **One of**
+      - Automated
+      - Custom
+      - Disabled
 ## Examples
 
   ```json
@@ -70,11 +76,14 @@ Form input parameters for configuring a bundle for deployment.
           "event_filter": "all"
       },
       "firehose": {
-          "buffer_interval": 60,
-          "buffer_size": 10,
+          "buffer_interval_seconds": 60,
+          "buffer_size_mb": 10,
           "dynamic_partitioning": {
               "enabled": false
           }
+      },
+      "monitoring": {
+          "mode": "AUTOMATED"
       }
   }
   ```
@@ -86,11 +95,14 @@ Form input parameters for configuring a bundle for deployment.
           "event_filter": "all"
       },
       "firehose": {
-          "buffer_interval": 600,
-          "buffer_size": 128,
+          "buffer_interval_seconds": 600,
+          "buffer_size_mb": 128,
           "dynamic_partitioning": {
               "enabled": false
           }
+      },
+      "monitoring": {
+          "mode": "AUTOMATED"
       }
   }
   ```
@@ -148,7 +160,7 @@ Connections from other bundles that this bundle depends on.
 
     - **`security`** *(object)*: Informs downstream services of network and/or IAM policies. Cannot contain additional properties.
       - **`iam`** *(object)*: IAM Policies. Cannot contain additional properties.
-        - **`^[a-z-/]+$`** *(object)*
+        - **`^[a-z]+[a-z_]*[a-z]+$`** *(object)*
           - **`policy_arn`** *(string)*: AWS IAM policy ARN.
 
             Examples:
@@ -212,7 +224,7 @@ Connections from other bundles that this bundle depends on.
 
     - **`security`** *(object)*: Informs downstream services of network and/or IAM policies. Cannot contain additional properties.
       - **`iam`** *(object)*: IAM Policies. Cannot contain additional properties.
-        - **`^[a-z-/]+$`** *(object)*
+        - **`^[a-z]+[a-z_]*[a-z]+$`** *(object)*
           - **`policy_arn`** *(string)*: AWS IAM policy ARN.
 
             Examples:

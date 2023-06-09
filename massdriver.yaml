@@ -5,8 +5,22 @@ source_url: github.com/massdriver-cloud/aws-firehose-eventbridge-subscriber
 access: "public"
 type: "infrastructure"
 
-# schema-params.json
-# JSON Schema sans-fields above
+CloudWatchAlarmMetricInteger: &cloudwatch_alarm_metric
+  required:
+    - threshold
+    - period
+  properties:
+    threshold:
+      type: integer
+      title: Threshold
+    period:
+      type: integer
+      title: Period
+      minimum: 1
+      maximum: 86400
+      default: 300
+      description: The length of time associated with this statistic
+
 params:
   examples:
     - __name: Small Batch
@@ -17,6 +31,8 @@ params:
           enabled: false
         buffer_size_mb: 10
         buffer_interval_seconds: 60
+      monitoring:
+        mode: AUTOMATED
     - __name: Large Batch
       event_rule:
         event_filter: all
@@ -25,13 +41,17 @@ params:
           enabled: false
         buffer_size_mb: 128
         buffer_interval_seconds: 600
+      monitoring:
+        mode: AUTOMATED
   required:
     - event_rule
     - firehose
+    - monitoring
   properties:
     event_rule:
       type: object
       title: "Event Rule Settings"
+      description: "Filter events based on data within the event. More information can be found [here](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html)"
       dependencies:
         event_filter:
           oneOf:
@@ -109,6 +129,48 @@ params:
           default: 300
           minimum: 60
           maximum: 900
+    monitoring:
+      type: object
+      title: Monitoring
+      properties:
+        mode:
+          title: Alarm Mode
+          description: Enable and customize Kinesis Delivery Stream metric alarms.
+          type: string
+          default: AUTOMATED
+          oneOf:
+            - const: AUTOMATED
+              title: Automated
+            - const: CUSTOM
+              title: Custom
+            - const: DISABLED
+              title: Disabled
+      dependencies:
+        mode:
+          oneOf:
+            - properties:
+                mode:
+                  const: AUTOMATED
+            - properties:
+                mode:
+                  const: DISABLED
+            - properties:
+                mode:
+                  const: CUSTOM
+                alarms:
+                  type: object
+                  title: Alarms
+                  properties:
+                    partition_size:
+                      title: Partition Size
+                      description: "Alert when active dynamic partitions reaches a percentage of maximum quota of 500"
+                      type: object
+                      <<: *cloudwatch_alarm_metric
+                    s3_delivery_success:
+                      title: Delivery Stream Success Rate
+                      description: "Threshold for S3 write success as a percantage of total operations"
+                      type: object
+                      <<: *cloudwatch_alarm_metric
 
 # schema-connections.json
 # Named list of input connections (artifacts) (map[name]artifact)
@@ -137,6 +199,7 @@ ui:
   ui:order:
     - event_rule
     - firehose
+    - monitoring
   event_rule:
     ui:order:
       - event_filter
@@ -156,3 +219,12 @@ ui:
     buffer_interval_seconds:
       ui:field: conversionFieldTime
       unit: Seconds
+  monitoring:
+    ui:order:
+      - mode
+      - alarms
+    alarms:
+      latency:
+        threshold:
+          ui:field: conversionFieldTime
+          unit: Seconds
