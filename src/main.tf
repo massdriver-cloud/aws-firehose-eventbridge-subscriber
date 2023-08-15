@@ -4,7 +4,7 @@ locals {
 }
 
 module "firehose" {
-  source                       = "github.com/massdriver-cloud/terraform-modules//aws/aws-kinesis-firehose?ref=d4b66db"
+  source                       = "github.com/massdriver-cloud/terraform-modules//aws/aws-kinesis-firehose?ref=df15421"
   name                         = var.md_metadata.name_prefix
   dynamic_partitioning_enabled = var.firehose.dynamic_partitioning.enabled
   query                        = local.dynamic_partitioning_query
@@ -16,7 +16,7 @@ module "firehose" {
 }
 
 module "event_rule" {
-  source               = "github.com/massdriver-cloud/terraform-modules//aws/aws-eventbridge-rule?ref=d4b66db"
+  source               = "github.com/massdriver-cloud/terraform-modules//aws/aws-eventbridge-rule?ref=df15421"
   name                 = var.md_metadata.name_prefix
   event_filter         = var.event_rule.event_filter
   event_filter_pattern = local.filter_pattern
