@@ -40,8 +40,7 @@ resource "aws_iam_policy" "firehose_writer" {
   })
 }
 
-resource "aws_iam_policy_attachment" "eventbridge" {
-  name       = "${var.md_metadata.name_prefix}-eventbridge-rule-attachment"
-  roles      = [module.event_rule.role_name]
+resource "aws_iam_role_policy_attachment" "eventbridge" {
+  role       = module.event_rule.role_name
   policy_arn = aws_iam_policy.firehose_writer.arn
 }
