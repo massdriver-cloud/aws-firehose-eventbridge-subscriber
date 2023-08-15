@@ -4,7 +4,7 @@ locals {
 }
 
 module "firehose" {
-  source                       = "github.com/massdriver-cloud/terraform-modules//aws/aws-kinesis-firehose?ref=d4b66db"
+  source                       = "github.com/massdriver-cloud/terraform-modules//aws/aws-kinesis-firehose?ref=df15421"
   name                         = var.md_metadata.name_prefix
   dynamic_partitioning_enabled = var.firehose.dynamic_partitioning.enabled
   query                        = local.dynamic_partitioning_query
@@ -16,7 +16,7 @@ module "firehose" {
 }
 
 module "event_rule" {
-  source               = "github.com/massdriver-cloud/terraform-modules//aws/aws-eventbridge-rule?ref=d4b66db"
+  source               = "github.com/massdriver-cloud/terraform-modules//aws/aws-eventbridge-rule?ref=df15421"
   name                 = var.md_metadata.name_prefix
   event_filter         = var.event_rule.event_filter
   event_filter_pattern = local.filter_pattern
@@ -40,8 +40,7 @@ resource "aws_iam_policy" "firehose_writer" {
   })
 }
 
-resource "aws_iam_policy_attachment" "eventbridge" {
-  name       = "${var.md_metadata.name_prefix}-eventbridge-rule-attachment"
-  roles      = [module.event_rule.role_name]
+resource "aws_iam_role_policy_attachment" "eventbridge" {
+  role       = module.event_rule.role_name
   policy_arn = aws_iam_policy.firehose_writer.arn
 }
