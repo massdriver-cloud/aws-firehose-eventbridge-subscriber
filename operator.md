@@ -94,3 +94,10 @@ This will test whether the specified actions are allowed for the role.
 
 By following these troubleshooting steps, you should be able to manage and resolve common issues with your AWS Kinesis Firehose and EventBridge integration.
 
+### Links
+
+- [Eventbridge Events](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-events.html)
+- [Eventbridge Matching](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html)
+- [Firehose Basics](https://docs.aws.amazon.com/firehose/latest/dev/what-is-this-service.html)
+- [Firehose Key Concepts](https://docs.aws.amazon.com/firehose/latest/dev/what-is-this-service.html)
+- [Dynamic Partitioning](https://docs.aws.amazon.com/firehose/latest/dev/dynamic-partitioning.html#dynamic-partitioning-s3bucketprefix)
