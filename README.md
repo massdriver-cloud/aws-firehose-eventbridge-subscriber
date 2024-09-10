@@ -37,60 +37,8 @@ Form input parameters for configuring a bundle for deployment.
 <summary>View</summary>
 
 <!-- PARAMS:START -->
-## Properties
 
-- **`event_rule`** *(object)*: Filter events based on data within the event. More information can be found [here](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html).
-  - **`event_filter`** *(string)*: Must be one of: `['all', 'custom']`. Default: `all`.
-- **`firehose`** *(object)*
-  - **`buffer_interval_seconds`** *(integer)*: Minimum: `60`. Maximum: `900`. Default: `300`.
-  - **`buffer_size_mb`** *(integer)*: Minimum: `1`. Maximum: `128`. Default: `64`.
-  - **`dynamic_partitioning`** *(object)*
-    - **`enabled`** *(boolean)*: Dynamic partitioning allows you to parse incoming events and pull a value which can be used as a prefix in s3 directories. More information about dynamic paritioning can be found [here](https://docs.aws.amazon.com/firehose/latest/dev/dynamic-partitioning.html). Default: `False`.
-- **`monitoring`** *(object)*
-  - **`mode`** *(string)*: Enable and customize Kinesis Delivery Stream metric alarms. Default: `AUTOMATED`.
-    - **One of**
-      - Automated
-      - Custom
-      - Disabled
-## Examples
-
-  ```json
-  {
-      "__name": "Small Batch",
-      "event_rule": {
-          "event_filter": "all"
-      },
-      "firehose": {
-          "buffer_interval_seconds": 60,
-          "buffer_size_mb": 10,
-          "dynamic_partitioning": {
-              "enabled": false
-          }
-      },
-      "monitoring": {
-          "mode": "AUTOMATED"
-      }
-  }
-  ```
-
-  ```json
-  {
-      "__name": "Large Batch",
-      "event_rule": {
-          "event_filter": "all"
-      },
-      "firehose": {
-          "buffer_interval_seconds": 600,
-          "buffer_size_mb": 128,
-          "dynamic_partitioning": {
-              "enabled": false
-          }
-      },
-      "monitoring": {
-          "mode": "AUTOMATED"
-      }
-  }
-  ```
+**Params coming soon**
 
 <!-- PARAMS:END -->
 
@@ -104,158 +52,8 @@ Connections from other bundles that this bundle depends on.
 <summary>View</summary>
 
 <!-- CONNECTIONS:START -->
-## Properties
 
-- **`aws_authentication`** *(object)*: . Cannot contain additional properties.
-  - **`data`** *(object)*
-    - **`arn`** *(string)*: Amazon Resource Name.
-
-      Examples:
-      ```json
-      "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
-      ```
-
-      ```json
-      "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
-      ```
-
-    - **`external_id`** *(string)*: An external ID is a piece of data that can be passed to the AssumeRole API of the Security Token Service (STS). You can then use the external ID in the condition element in a role's trust policy, allowing the role to be assumed only when a certain value is present in the external ID.
-  - **`specs`** *(object)*
-    - **`aws`** *(object)*: .
-      - **`region`** *(string)*: AWS Region to provision in.
-
-        Examples:
-        ```json
-        "us-west-2"
-        ```
-
-- **`event_destination`** *(object)*: Cannot contain additional properties.
-  - **`data`** *(object)*
-    - **`infrastructure`** *(object)*
-      - **`arn`** *(string)*: Amazon Resource Name.
-
-        Examples:
-        ```json
-        "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
-        ```
-
-        ```json
-        "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
-        ```
-
-    - **`security`** *(object)*: Informs downstream services of network and/or IAM policies. Cannot contain additional properties.
-      - **`iam`** *(object)*: IAM Policies. Cannot contain additional properties.
-        - **`^[a-z]+[a-z_]*[a-z]+$`** *(object)*
-          - **`policy_arn`** *(string)*: AWS IAM policy ARN.
-
-            Examples:
-            ```json
-            "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
-            ```
-
-            ```json
-            "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
-            ```
-
-      - **`identity`** *(object)*: For instances where IAM policies must be attached to a role attached to an AWS resource, for instance AWS Eventbridge to Firehose, this attribute should be used to allow the downstream to attach it's policies (Firehose) directly to the IAM role created by the upstream (Eventbridge). It is important to remember that connections in massdriver are one way, this scheme perserves the dependency relationship while allowing bundles to control the lifecycles of resources under it's management. Cannot contain additional properties.
-        - **`role_arn`** *(string)*: ARN for this resources IAM Role.
-
-          Examples:
-          ```json
-          "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
-          ```
-
-          ```json
-          "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
-          ```
-
-      - **`network`** *(object)*: AWS security group rules to inform downstream services of ports to open for communication. Cannot contain additional properties.
-        - **`^[a-z-]+$`** *(object)*
-          - **`arn`** *(string)*: Amazon Resource Name.
-
-            Examples:
-            ```json
-            "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
-            ```
-
-            ```json
-            "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
-            ```
-
-          - **`port`** *(integer)*: Port number. Minimum: `0`. Maximum: `65535`.
-          - **`protocol`** *(string)*: Must be one of: `['tcp', 'udp']`.
-  - **`specs`** *(object)*
-    - **`aws`** *(object)*: .
-      - **`region`** *(string)*: AWS Region to provision in.
-
-        Examples:
-        ```json
-        "us-west-2"
-        ```
-
-- **`event_source`** *(object)*: Connection details for EventBridge event bus. Cannot contain additional properties.
-  - **`data`** *(object)*
-    - **`infrastructure`** *(object)*
-      - **`arn`** *(string)*: Amazon Resource Name.
-
-        Examples:
-        ```json
-        "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
-        ```
-
-        ```json
-        "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
-        ```
-
-    - **`security`** *(object)*: Informs downstream services of network and/or IAM policies. Cannot contain additional properties.
-      - **`iam`** *(object)*: IAM Policies. Cannot contain additional properties.
-        - **`^[a-z]+[a-z_]*[a-z]+$`** *(object)*
-          - **`policy_arn`** *(string)*: AWS IAM policy ARN.
-
-            Examples:
-            ```json
-            "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
-            ```
-
-            ```json
-            "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
-            ```
-
-      - **`identity`** *(object)*: For instances where IAM policies must be attached to a role attached to an AWS resource, for instance AWS Eventbridge to Firehose, this attribute should be used to allow the downstream to attach it's policies (Firehose) directly to the IAM role created by the upstream (Eventbridge). It is important to remember that connections in massdriver are one way, this scheme perserves the dependency relationship while allowing bundles to control the lifecycles of resources under it's management. Cannot contain additional properties.
-        - **`role_arn`** *(string)*: ARN for this resources IAM Role.
-
-          Examples:
-          ```json
-          "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
-          ```
-
-          ```json
-          "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
-          ```
-
-      - **`network`** *(object)*: AWS security group rules to inform downstream services of ports to open for communication. Cannot contain additional properties.
-        - **`^[a-z-]+$`** *(object)*
-          - **`arn`** *(string)*: Amazon Resource Name.
-
-            Examples:
-            ```json
-            "arn:aws:rds::ACCOUNT_NUMBER:db/prod"
-            ```
-
-            ```json
-            "arn:aws:ec2::ACCOUNT_NUMBER:vpc/vpc-foo"
-            ```
-
-          - **`port`** *(integer)*: Port number. Minimum: `0`. Maximum: `65535`.
-          - **`protocol`** *(string)*: Must be one of: `['tcp', 'udp']`.
-  - **`specs`** *(object)*
-    - **`aws`** *(object)*: .
-      - **`region`** *(string)*: AWS Region to provision in.
-
-        Examples:
-        ```json
-        "us-west-2"
-        ```
+**Connections coming soon**
 
 <!-- CONNECTIONS:END -->
 
@@ -269,7 +67,8 @@ Resources created by this bundle that can be connected to other bundles.
 <summary>View</summary>
 
 <!-- ARTIFACTS:START -->
-## Properties
+
+**Artifacts coming soon**
 
 <!-- ARTIFACTS:END -->
 
