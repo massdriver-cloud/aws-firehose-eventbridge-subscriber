@@ -3,7 +3,6 @@ name: aws-firehose-eventbridge-subscriber
 version: 1.0.0
 description: Write event data from EventBridge to S3.
 source_url: https://github.com/massdriver-cloud/aws-firehose-eventbridge-subscriber
-type: application
 CloudWatchAlarmMetricInteger:
   required: &1
   - threshold
