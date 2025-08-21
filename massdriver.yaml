@@ -1,15 +1,13 @@
 schema: draft-07
-name: "aws-firehose-eventbridge-subscriber"
-description: "Write event data from EventBridge to S3."
-source_url: github.com/massdriver-cloud/aws-firehose-eventbridge-subscriber
-access: "public"
-type: "infrastructure"
-
-CloudWatchAlarmMetricInteger: &cloudwatch_alarm_metric
-  required:
-    - threshold
-    - period
-  properties:
+name: aws-firehose-eventbridge-subscriber
+version: 1.0.0
+description: Write event data from EventBridge to S3.
+source_url: https://github.com/massdriver-cloud/aws-firehose-eventbridge-subscriber
+CloudWatchAlarmMetricInteger:
+  required: &1
+  - threshold
+  - period
+  properties: &2
     threshold:
       type: integer
       title: Threshold
@@ -20,63 +18,62 @@ CloudWatchAlarmMetricInteger: &cloudwatch_alarm_metric
       maximum: 86400
       default: 300
       description: The length of time associated with this statistic
-
 params:
   examples:
-    - __name: Small Batch
-      event_rule:
-        event_filter: all
-      firehose:
-        dynamic_partitioning:
-          enabled: false
-        buffer_size_mb: 10
-        buffer_interval_seconds: 60
-      monitoring:
-        mode: AUTOMATED
-    - __name: Large Batch
-      event_rule:
-        event_filter: all
-      firehose:
-        dynamic_partitioning:
-          enabled: false
-        buffer_size_mb: 128
-        buffer_interval_seconds: 600
-      monitoring:
-        mode: AUTOMATED
+  - __name: Small Batch
+    event_rule:
+      event_filter: all
+    firehose:
+      dynamic_partitioning:
+        enabled: false
+      buffer_size_mb: 10
+      buffer_interval_seconds: 60
+    monitoring:
+      mode: AUTOMATED
+  - __name: Large Batch
+    event_rule:
+      event_filter: all
+    firehose:
+      dynamic_partitioning:
+        enabled: false
+      buffer_size_mb: 128
+      buffer_interval_seconds: 600
+    monitoring:
+      mode: AUTOMATED
   required:
-    - event_rule
-    - firehose
-    - monitoring
+  - event_rule
+  - firehose
+  - monitoring
   properties:
     event_rule:
       type: object
-      title: "Event Rule Settings"
-      description: "Filter events based on data within the event. More information can be found [here](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html)"
+      title: Event Rule Settings
+      description: Filter events based on data within the event. More information can be found [here](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns.html)
       dependencies:
         event_filter:
           oneOf:
-            - properties:
-                event_filter:
-                  const: "custom"
-                event_filter_pattern:
-                  type: string
-                  title: "Event Filter Pattern"
-                  default: "{}"
-                  validJson: true
-            - properties:
-                event_filter:
-                  const: "all"
+          - properties:
+              event_filter:
+                const: custom
+              event_filter_pattern:
+                type: string
+                title: Event Filter Pattern
+                default: "{}"
+                validJson: true
+          - properties:
+              event_filter:
+                const: all
       properties:
         event_filter:
           type: string
-          title: "Event Filter"
-          default: "all"
+          title: Event Filter
+          default: all
           enum:
-            - "all"
-            - "custom"
+          - all
+          - custom
     firehose:
       type: object
-      title: "Firehose Settings"
+      title: Firehose Settings
       if:
         properties:
           dynamic_partitioning:
@@ -88,44 +85,44 @@ params:
           buffer_size_mb:
             minimum: 64
       required:
-        - buffer_size_mb
-        - buffer_interval_seconds
+      - buffer_size_mb
+      - buffer_interval_seconds
       properties:
         dynamic_partitioning:
           type: object
-          title: "Dynamic Partitioning"
+          title: Dynamic Partitioning
           required:
-            - enabled
+          - enabled
           dependencies:
             enabled:
               oneOf:
-                - properties:
-                    enabled:
-                      const: true
-                    query:
-                      type: string
-                      title: "JQ Query"
-                      description: "JQ expression which will be used to parse incoming events and produce a single string to be used as the partition key in S3. More information on JQ can be found [here](https://devdocs.io/jq/)"
-                  required:
-                    - query
-                - properties:
-                    enabled:
-                      const: false
+              - properties:
+                  enabled:
+                    const: true
+                  query:
+                    type: string
+                    title: JQ Query
+                    description: JQ expression which will be used to parse incoming events and produce a single string to be used as the partition key in S3. More information on JQ can be found [here](https://devdocs.io/jq/)
+                required:
+                - query
+              - properties:
+                  enabled:
+                    const: false
           properties:
             enabled:
               type: boolean
-              title: "Enabled?"
+              title: Enabled?
               default: false
-              description: "Dynamic partitioning allows you to parse incoming events and pull a value which can be used as a prefix in s3 directories. More information about dynamic paritioning can be found [here](https://docs.aws.amazon.com/firehose/latest/dev/dynamic-partitioning.html)"
+              description: Dynamic partitioning allows you to parse incoming events and pull a value which can be used as a prefix in s3 directories. More information about dynamic paritioning can be found [here](https://docs.aws.amazon.com/firehose/latest/dev/dynamic-partitioning.html)
         buffer_size_mb:
           type: integer
-          title: "Buffer Size"
+          title: Buffer Size
           default: 64
           minimum: 1
           maximum: 128
         buffer_interval_seconds:
           type: integer
-          title: "Buffer Interval"
+          title: Buffer Interval
           default: 300
           minimum: 60
           maximum: 900
@@ -139,80 +136,72 @@ params:
           type: string
           default: AUTOMATED
           oneOf:
-            - const: AUTOMATED
-              title: Automated
-            - const: CUSTOM
-              title: Custom
-            - const: DISABLED
-              title: Disabled
+          - const: AUTOMATED
+            title: Automated
+          - const: CUSTOM
+            title: Custom
+          - const: DISABLED
+            title: Disabled
       dependencies:
         mode:
           oneOf:
-            - properties:
-                mode:
-                  const: AUTOMATED
-            - properties:
-                mode:
-                  const: DISABLED
-            - properties:
-                mode:
-                  const: CUSTOM
-                alarms:
-                  type: object
-                  title: Alarms
-                  properties:
-                    partition_size:
-                      title: Partition Size
-                      description: "Alert when active dynamic partitions reaches a percentage of maximum quota of 500"
-                      type: object
-                      <<: *cloudwatch_alarm_metric
-                    s3_delivery_success:
-                      title: Delivery Stream Success Rate
-                      description: "Threshold for S3 write success as a percantage of total operations"
-                      type: object
-                      <<: *cloudwatch_alarm_metric
-
-# schema-connections.json
-# Named list of input connections (artifacts) (map[name]artifact)
-
+          - properties:
+              mode:
+                const: AUTOMATED
+          - properties:
+              mode:
+                const: DISABLED
+          - properties:
+              mode:
+                const: CUSTOM
+              alarms:
+                type: object
+                title: Alarms
+                properties:
+                  partition_size:
+                    title: Partition Size
+                    description: Alert when active dynamic partitions reaches a percentage of maximum quota of 500
+                    type: object
+                    required: *1
+                    properties: *2
+                  s3_delivery_success:
+                    title: Delivery Stream Success Rate
+                    description: Threshold for S3 write success as a percantage of total operations
+                    type: object
+                    required: *1
+                    properties: *2
 connections:
   required:
-    - aws_authentication
-    - event_source
-    - event_destination
+  - aws_authentication
+  - event_source
+  - event_destination
   properties:
     aws_authentication:
-      $ref: massdriver/aws-iam-role
+      "$ref": massdriver/aws-iam-role
     event_source:
-      $ref: massdriver/aws-eventbridge
+      "$ref": massdriver/aws-eventbridge
     event_destination:
-      $ref: massdriver/aws-s3-bucket
-
-# schema-artifacts.json
-# Named list of output artifacts  (map[name]artifact)
+      "$ref": massdriver/aws-s3-bucket
 artifacts:
   properties: {}
-
-# schema-ui.json
-# List of form customizations for params-schema
 ui:
   ui:order:
-    - event_rule
-    - firehose
-    - monitoring
+  - event_rule
+  - firehose
+  - monitoring
   event_rule:
     ui:order:
-      - event_filter
-      - event_filter_pattern
+    - event_filter
+    - event_filter_pattern
   firehose:
     ui:order:
-      - buffer_size_mb
-      - buffer_interval_seconds
-      - dynamic_partitioning
+    - buffer_size_mb
+    - buffer_interval_seconds
+    - dynamic_partitioning
     dynamic_partioning:
       ui:order:
-        - enabled
-        - query
+      - enabled
+      - query
     buffer_size_mb:
       ui:field: conversionFieldData
       unit: MB
@@ -221,10 +210,16 @@ ui:
       unit: Seconds
   monitoring:
     ui:order:
-      - mode
-      - alarms
+    - mode
+    - alarms
     alarms:
       latency:
         threshold:
           ui:field: conversionFieldTime
           unit: Seconds
+steps:
+- path: src
+  provisioner: opentofu
+  config:
+    checkov:
+      enable: true
