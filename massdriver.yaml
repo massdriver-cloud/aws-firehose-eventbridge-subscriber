@@ -177,11 +177,11 @@ connections:
   - event_destination
   properties:
     aws_authentication:
-      "$ref": massdriver/aws-iam-role
+      "$ref": aws-iam-role
     event_source:
-      "$ref": massdriver/aws-eventbridge
+      "$ref": aws-eventbridge
     event_destination:
-      "$ref": massdriver/aws-s3-bucket
+      "$ref": aws-s3-bucket
 artifacts:
   properties: {}
 ui:
